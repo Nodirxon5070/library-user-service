@@ -1,0 +1,4 @@
+User Service      -> users,cards,gender
+Order Service     -> orders,orders-books
+Book Service      -> books,author
+Publisher Service -> publisher,goals,image

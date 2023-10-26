@@ -9,8 +9,9 @@ import org.springframework.context.annotation.Lazy;
 
 import java.util.stream.Collectors;
 
-@Mapper(componentModel = "spring", imports = Collectors.class)
+@Mapper(componentModel = "spring" , imports = Collectors.class)
 public abstract class UserMapper {
+
 
     @Lazy
     @Autowired
@@ -21,36 +22,27 @@ public abstract class UserMapper {
     protected CardMapper cardMapper;
 
 
-
     @Mapping(target = "cards", ignore = true)
-    @Mapping(target = "orders", ignore = true)
     public abstract UserDto toDto(User user);
 
-    public void view() {
-        UserDto dto = new UserDto();
-        User user = new User();
-    }
-
     @Mapping(target = "cards", ignore = true)
-    @Mapping(target = "orders", ignore = true)
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deletedAt", ignore = true)
     public abstract User toEntity(UserDto dto);
 
-    @Mapping(target = "orders", ignore = true)
     @Mapping(target = "cards", expression = "java(user.getCards().stream().map(this.cardMapper::toDtoNotUser).collect(Collectors.toSet()))")
     public abstract UserDto toDtoWithCard(User user);
 
     @Mapping(target = "cards", ignore = true)
-    @Mapping(target = "orders", ignore = true)
     @Mapping(target = "userId", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "deletedAt", ignore = true)
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, resultType = User.class)
     public abstract User updateUserFromDto(UserDto dto, @MappingTarget User user);
+
 
 
 }

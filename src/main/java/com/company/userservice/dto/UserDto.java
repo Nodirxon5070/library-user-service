@@ -32,7 +32,6 @@ public class UserDto {
     private Boolean enabled;
 
     private Set<CardDto> cards;
-//    private Set<OrdersDto> orders;
 
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;

@@ -27,12 +27,14 @@ public class User {
 
     @Column(name = "firstname")
     private String firstName;
+    @Column(name = "lastname")
     private String lastName;
     private String email;
     @Column(name = "gender_id")
     private String gender;
     private String phone;
     private String password;
+    private Integer cardId;
     @Column(name = "birth_date")
     private String birthDate;
 
@@ -43,10 +45,6 @@ public class User {
     private Set<Card> cards;
 
     private LocalDateTime createdAt;
-
-
     private LocalDateTime updatedAt;
-
-    @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
 }
