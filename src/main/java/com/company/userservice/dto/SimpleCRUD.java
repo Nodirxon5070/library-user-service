@@ -1,11 +1,14 @@
 package com.company.userservice.dto;
 
-public interface SimpleCRUD<K, V> {
-    ResponseDto<V> create(V dto);
+import org.springframework.http.ResponseEntity;
 
-    ResponseDto<V> get(K entityId);
+public interface SimpleCRUD<K, RS, RQ> {
+    ResponseEntity<ResponseDto<RS>> create(RQ dto);
 
-    ResponseDto<V> update(K entityId, V dto);
+    ResponseEntity<ResponseDto<RS>> get(K entityId);
 
-    ResponseDto<V> delete(K entityId);
+    ResponseEntity<ResponseDto<RS>> update(K entityId, RQ dto);
+
+    ResponseEntity<ResponseDto<RS>> delete(K entityId);
 }
+

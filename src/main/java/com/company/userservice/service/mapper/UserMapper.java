@@ -1,6 +1,8 @@
 package com.company.userservice.service.mapper;
 
 import com.company.userservice.dto.UserDto;
+import com.company.userservice.dto.request.UserRequestDto;
+import com.company.userservice.dto.response.UserResponseDto;
 import com.company.userservice.modul.User;
 import com.company.userservice.service.CardService;
 import org.mapstruct.*;
@@ -22,26 +24,17 @@ public abstract class UserMapper {
     protected CardMapper cardMapper;
 
 
-    @Mapping(target = "cards", ignore = true)
-    public abstract UserDto toDto(User user);
+    public abstract UserResponseDto toDto(User user);
 
-    @Mapping(target = "cards", ignore = true)
-    @Mapping(target = "userId", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
-    public abstract User toEntity(UserDto dto);
+
+    public abstract User toEntity(UserRequestDto dto);
 
     @Mapping(target = "cards", expression = "java(user.getCards().stream().map(this.cardMapper::toDtoNotUser).collect(Collectors.toSet()))")
-    public abstract UserDto toDtoWithCard(User user);
+    public abstract UserResponseDto toDtoWithCard(User user);
 
-    @Mapping(target = "cards", ignore = true)
-    @Mapping(target = "userId", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
+
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE, resultType = User.class)
-    public abstract User updateUserFromDto(UserDto dto, @MappingTarget User user);
+    public abstract User updateUserFromDto(UserRequestDto dto, @MappingTarget User user);
 
 
 

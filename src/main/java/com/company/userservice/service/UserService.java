@@ -3,6 +3,8 @@ package com.company.userservice.service;
 import com.company.userservice.dto.ResponseDto;
 import com.company.userservice.dto.SimpleCRUD;
 import com.company.userservice.dto.UserDto;
+import com.company.userservice.dto.request.UserRequestDto;
+import com.company.userservice.dto.response.UserResponseDto;
 import com.company.userservice.modul.User;
 import com.company.userservice.repository.UserRepository;
 import com.company.userservice.service.mapper.UserMapper;
@@ -18,50 +20,48 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
-public class UserService implements SimpleCRUD<Integer, UserDto> {
+public class UserService {
 
     private final UserRepository userRepository;
     protected final UserMapper userMapper;
-    public ResponseDto<UserDto> create(UserDto dto) {
+    public ResponseDto<UserResponseDto> create(UserRequestDto dto) {
         try {
             return Optional.ofNullable(this.userMapper.toEntity(dto))
                     .map(user -> {
                         user.setCreatedAt(LocalDateTime.now());
-                        return ResponseDto.<UserDto>builder()
+                        return ResponseDto.<UserResponseDto>builder()
                                 .success(true)
                                 .message("OK")
                                 .data(this.userMapper.toDto(this.userRepository.save(user)))
                                 .build();
                     }).orElse(null);
         } catch (Exception e) {
-            return ResponseDto.<UserDto>builder()
+            return ResponseDto.<UserResponseDto>builder()
                     .message(String.format("User while saving error %s", e.getMessage()))
                     .code(-2)
                     .build();
         }
     }
 
-    @Override
-    public ResponseDto<UserDto> get(Integer entityId) {
+    public ResponseDto<UserResponseDto> get(Integer entityId) {
         return this.userRepository.findByUserIdAndDeletedAtIsNull(entityId)
-                .map(user -> ResponseDto.<UserDto>builder()
+                .map(user -> ResponseDto.<UserResponseDto>builder()
                         .success(true)
                         .message("OK")
                         .data(this.userMapper.toDtoWithCard(user))
                         .build())
-                .orElse(ResponseDto.<UserDto>builder()
+                .orElse(ResponseDto.<UserResponseDto>builder()
                         .message(String.format("User with id: %s is not found!", entityId))
                         .code(-1)
                         .build());
     }
 
-    @Override
-    public ResponseDto<UserDto> update(Integer entityId, UserDto dto) {
+    public ResponseDto<UserResponseDto> update(Integer entityId, UserRequestDto dto) {
         try {
             return this.userRepository.findByUserIdAndDeletedAtIsNull(entityId)
                     .map(user -> {
                         user.setUpdatedAt(LocalDateTime.now());
-                        return ResponseDto.<UserDto>builder()
+                        return ResponseDto.<UserResponseDto>builder()
                                 .success(true)
                                 .message("OK")
                                 .data(this.userMapper.toDto(
@@ -71,25 +71,24 @@ public class UserService implements SimpleCRUD<Integer, UserDto> {
                                 ))
                                 .build();
                     })
-                    .orElse(ResponseDto.<UserDto>builder()
+                    .orElse(ResponseDto.<UserResponseDto>builder()
                             .message("User is not found!")
                             .code(-1)
                             .build());
         } catch (Exception e) {
-            return ResponseDto.<UserDto>builder()
+            return ResponseDto.<UserResponseDto>builder()
                     .message(String.format("User while updating error %s", e.getMessage()))
                     .code(-2)
                     .build();
         }
     }
 
-    @Override
-    public ResponseDto<UserDto> delete(Integer entityId) {
+    public ResponseDto<UserResponseDto> delete(Integer entityId) {
         try {
             return this.userRepository.findByUserIdAndDeletedAtIsNull(entityId)
                     .map(user -> {
                         user.setDeletedAt(LocalDateTime.now());
-                        return ResponseDto.<UserDto>builder()
+                        return ResponseDto.<UserResponseDto>builder()
                                 .success(true)
                                 .message("OK")
                                 .data(this.userMapper.toDto(
@@ -97,56 +96,56 @@ public class UserService implements SimpleCRUD<Integer, UserDto> {
                                 ))
                                 .build();
                     })
-                    .orElse(ResponseDto.<UserDto>builder()
+                    .orElse(ResponseDto.<UserResponseDto>builder()
                             .message("User is not found!")
                             .code(-1)
                             .build());
         } catch (Exception e) {
-            return ResponseDto.<UserDto>builder()
+            return ResponseDto.<UserResponseDto>builder()
                     .message(String.format("User deleting saving error %s", e.getMessage()))
                     .code(-2)
                     .build();
         }
     }
 
-    public ResponseDto<List<UserDto>> getAllUsers() {
+    public ResponseDto<List<UserResponseDto>> getAllUsers() {
         List<User> userList = this.userRepository.findAllByDeletedAtIsNull();
         if (userList.isEmpty()) {
-            return ResponseDto.<List<UserDto>>builder()
+            return ResponseDto.<List<UserResponseDto>>builder()
                     .message("Users are not found!")
                     .code(-1)
                     .build();
         }
-        return ResponseDto.<List<UserDto>>builder()
+        return ResponseDto.<List<UserResponseDto>>builder()
                 .message("OK")
                 .data(userList.stream().map(this.userMapper::toDto).toList())
                 .build();
     }
 
-    public ResponseDto<Page<UserDto>> getAllUserByPage(Integer page, Integer size) {
+    public ResponseDto<Page<UserResponseDto>> getAllUserByPage(Integer page, Integer size) {
         Page<User> userPage = this.userRepository.findAllByDeletedAtIsNull(PageRequest.of(page, size));
         if (userPage.isEmpty()) {
-            return ResponseDto.<Page<UserDto>>builder()
+            return ResponseDto.<Page<UserResponseDto>>builder()
                     .message("Users are not found!")
                     .code(-1)
                     .build();
         }
-        return ResponseDto.<Page<UserDto>>builder()
+        return ResponseDto.<Page<UserResponseDto>>builder()
                 .success(true)
                 .message("OK")
                 .data(userPage.map(this.userMapper::toDto))
                 .build();
     }
 
-    public ResponseDto<List<UserDto>> searchUserByFirstname(String value) {
+    public ResponseDto<List<UserResponseDto>> searchUserByFirstname(String value) {
         List<User> userList = this.userRepository.searchUserByFirstname(value);
         if (userList.isEmpty()) {
-            return ResponseDto.<List<UserDto>>builder()
+            return ResponseDto.<List<UserResponseDto>>builder()
                     .message("Users are not found!")
                     .code(-1)
                     .build();
         }
-        return ResponseDto.<List<UserDto>>builder()
+        return ResponseDto.<List<UserResponseDto>>builder()
                 .success(true)
                 .message("OK")
                 .data(userList.stream().map(this.userMapper::toDto).toList())
@@ -154,33 +153,33 @@ public class UserService implements SimpleCRUD<Integer, UserDto> {
     }
 
 
-    public ResponseDto<Page<UserDto>> searchAllUserByValue(Integer size, Integer page, String value) {
+    public ResponseDto<Page<UserResponseDto>> searchAllUserByValue(Integer size, Integer page, String value) {
         return Optional.ofNullable(this.userRepository.searchAllUserByValue(PageRequest.of(page, size), value))
-                .map(users -> ResponseDto.<Page<UserDto>>builder()
+                .map(users -> ResponseDto.<Page<UserResponseDto>>builder()
                         .success(true)
                         .message("OK")
                         .data(users.map(this.userMapper::toDto))
                         .build())
-                .orElse(ResponseDto.<Page<UserDto>>builder()
+                .orElse(ResponseDto.<Page<UserResponseDto>>builder()
                         .message("Users are not found!")
                         .code(-1)
                         .build());
     }
 
-    public ResponseDto<List<UserDto>> getAllUserByValue(String value) {
+    public ResponseDto<List<UserResponseDto>> getAllUserByValue(String value) {
         return Optional.ofNullable(this.userRepository.findAllUserByNameValue(value))
-                .map(users -> ResponseDto.<List<UserDto>>builder()
+                .map(users -> ResponseDto.<List<UserResponseDto>>builder()
                         .success(true)
                         .message("OK")
                         .data(users.stream().map(this.userMapper::toDto).toList())
                         .build())
-                .orElse(ResponseDto.<List<UserDto>>builder()
+                .orElse(ResponseDto.<List<UserResponseDto>>builder()
                         .message("Users are not found!")
                         .code(-1)
                         .build());
     }
 
-    public ResponseDto<Page<UserDto>> getAllUserByBasicParams(Map<String, String> params) {
+    public ResponseDto<Page<UserResponseDto>> getAllUserByBasicParams(Map<String, String> params) {
         int page = 0, size = 10;
         if (params.containsKey("page")) {
             page = Integer.parseInt(params.get("page"));
@@ -197,7 +196,7 @@ public class UserService implements SimpleCRUD<Integer, UserDto> {
                 PageRequest.of(page, size)
         );
 
-        return ResponseDto.<Page<UserDto>>builder()
+        return ResponseDto.<Page<UserResponseDto>>builder()
                 .success(true)
                 .message("OK")
                 .data(users.map(this.userMapper::toDto))
@@ -205,15 +204,15 @@ public class UserService implements SimpleCRUD<Integer, UserDto> {
 
     }
 
-    public ResponseDto<List<UserDto>> getAllByDeletedAtIsNotNull() {
+    public ResponseDto<List<UserResponseDto>> getAllByDeletedAtIsNotNull() {
         List<User> userList = this.userRepository.findAllByDeletedAtIsNotNull();
         if (userList.isEmpty()) {
-            return ResponseDto.<List<UserDto>>builder()
+            return ResponseDto.<List<UserResponseDto>>builder()
                     .success(true)
                     .message("User are not found!")
                     .build();
         }
-        return ResponseDto.<List<UserDto>>builder()
+        return ResponseDto.<List<UserResponseDto>>builder()
                 .success(true)
                 .message("OK")
                 .data(userList.stream().map(this.userMapper::toDto).toList())

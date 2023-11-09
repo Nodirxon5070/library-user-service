@@ -1,6 +1,8 @@
 package com.company.userservice.service.mapper;
 
 import com.company.userservice.dto.CardDto;
+import com.company.userservice.dto.request.CardRequestDto;
+import com.company.userservice.dto.response.CardResponseDto;
 import com.company.userservice.modul.Card;
 import com.company.userservice.service.UserService;
 import org.mapstruct.*;
@@ -14,25 +16,20 @@ public abstract class CardMapper {
 
     @Autowired
     protected UserService userService;
-    @Mapping(target = "user", ignore = true)
-    @Mapping(target = "cardId", ignore = true)
-    @Mapping(target = "createdAt", ignore = true)
-    @Mapping(target = "updatedAt", ignore = true)
-    @Mapping(target = "deletedAt", ignore = true)
-    public abstract Card toEntity(CardDto dto);
+
+    public abstract Card toEntity(CardRequestDto dto);
 
     @Mapping(target = "user", expression = "java(this.userMapper.toDto(card.getUser()))")
-    public abstract CardDto toDto(Card card);
+    public abstract CardResponseDto toDto(Card card);
 
     @Mapping(target = "user", ignore = true)
-    public abstract CardDto toDtoNotUser(Card card);
+    public abstract CardResponseDto toDtoNotUser(Card card);
 
     @Mapping(target = "user", expression = "java(userService.get(card.getUserId()).getData())")
-    public abstract CardDto toDtoWithUser(Card card);
+    public abstract CardResponseDto toDtoWithUser(Card card);
 
     @Mapping(target = "user", ignore = true)
-    @Mapping(target = "userId", ignore = true)
-    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
-    public abstract void updateCardToDto(CardDto dto, @MappingTarget Card card);
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,resultType = Card.class)
+    public abstract Card updateCardToDto(CardRequestDto dto, @MappingTarget Card card);
 
 }
